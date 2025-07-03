@@ -347,6 +347,15 @@
                 resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte JSON eingeben.</p>";
             }
         });
+
+        <script>
+    window.addEventListener('load', () => {
+        if (!sessionStorage.getItem('firstVisitDone')) {
+            localStorage.clear(); // Löscht alle gespeicherten Daten im localStorage
+            sessionStorage.setItem('firstVisitDone', 'true'); // Merken, dass der Nutzer schon auf der Seite war
+        }
+    });
+</script>
     </script>
 </body>
 </html>
