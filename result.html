@@ -2,7 +2,6 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>UniGate – Deine Empfehlungen</title>
     <style>
         * { box-sizing: border-box; }
@@ -280,55 +279,7 @@
             });
         }
 
-        // Beim Laden der Seite direkt aus localStorage laden
-        document.addEventListener('DOMContentLoaded', () => {
-            const stored = localStorage.getItem('results');
-            if (stored) {
-                try {
-                    const results = JSON.parse(stored);
-                    renderResults(results);
-                } catch {
-                    resultsContainer.innerHTML = "<p>Gespeicherte Daten sind ungültig.</p>";
-                }
-            } else {
-                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte JSON eingeben.</p>";
-            }
-        });
-
-        // JSON-Button öffnet Modal
-        jsonButton.addEventListener('click', () => {
-            // Falls schon was im localStorage ist, vorbefüllen
-            const stored = localStorage.getItem('results');
-            jsonTextarea.value = stored ? stored : '';
-            jsonModal.classList.add('active');
-        });
-
-        // Modal schließen
-        closeJsonBtn.addEventListener('click', () => {
-            jsonModal.classList.remove('active');
-        });
-
-        // JSON laden, speichern, Modal schließen, Ergebnisse anzeigen
-        loadJsonBtn.addEventListener('click', () => {
-            const input = jsonTextarea.value.trim();
-            if (!input) {
-                alert('Bitte JSON eingeben.');
-                return;
-            }
-            try {
-                const parsed = JSON.parse(input);
-                if (!Array.isArray(parsed)) {
-                    alert('Bitte ein JSON-Array eingeben.');
-                    return;
-                }
-                localStorage.setItem('results', JSON.stringify(parsed));
-                jsonModal.classList.remove('active');
-                renderResults(parsed);
-            } catch(e) {
-                alert('Ungültiges JSON: ' + e.message);
-            }
-        });
-
+        // Kombinierter DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
             if (!localStorage.getItem('cacheClearedOnce')) {
                 localStorage.removeItem('results');
@@ -348,12 +299,36 @@
             }
         });
 
-    window.addEventListener('load', () => {
-        if (!sessionStorage.getItem('firstVisitDone')) {
-            localStorage.clear(); // Löscht alle gespeicherten Daten im localStorage
-            sessionStorage.setItem('firstVisitDone', 'true'); // Merken, dass der Nutzer schon auf der Seite war
-        }
-    });
+        // JSON-Button öffnet Modal
+        jsonButton.addEventListener('click', () => {
+            const stored = localStorage.getItem('results');
+            jsonTextarea.value = stored ? stored : '';
+            jsonModal.classList.add('active');
+        });
+
+        closeJsonBtn.addEventListener('click', () => {
+            jsonModal.classList.remove('active');
+        });
+
+        loadJsonBtn.addEventListener('click', () => {
+            const input = jsonTextarea.value.trim();
+            if (!input) {
+                alert('Bitte JSON eingeben.');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(input);
+                if (!Array.isArray(parsed)) {
+                    alert('Bitte ein JSON-Array eingeben.');
+                    return;
+                }
+                localStorage.setItem('results', JSON.stringify(parsed));
+                jsonModal.classList.remove('active');
+                renderResults(parsed);
+            } catch(e) {
+                alert('Ungültiges JSON: ' + e.message);
+            }
+        });
     </script>
 </body>
 </html>
