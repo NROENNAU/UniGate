@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>UniGate – Deine Empfehlungen</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .slogan {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: #d0d0d0;
+        }
+        #jsonButton {
+            background-color: #00e676;
+            color: #000;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 1.5rem;
+            align-self: flex-start;
+        }
+        #jsonButton:hover {
+            background-color: #00c853;
+        }
+        #resultsContainer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .result-card {
+            background: #fff;
+            color: #000;
+            border-radius: 10px;
+            width: 280px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+        .result-card:hover {
+            transform: scale(1.03);
+        }
+        .bild-container {
+            position: relative;
+            height: 130px;
+            overflow: hidden;
+        }
+        .bild-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .match-faktor {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: rgba(0, 230, 118, 0.9);
+            color: #fff;
+            padding: 0.25rem 0.6rem;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        .infos {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .infos h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .infos h3 a {
+            color: #2575fc;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        .infos p {
+            margin: 0.2rem 0;
+            font-size: 0.9rem;
+        }
+        .bewerbung-link {
+            margin-top: 0.8rem;
+            background-color: #00e676;
+            color: #000;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            align-self: flex-start;
+        }
+        .bewerbung-link:hover {
+            background-color: #00c853;
+        }
+        .back-btn {
+            background: #fff;
+            border: none;
+            color: #2575fc;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: 0.3s;
+            align-self: center;
+        }
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* Modal Styles */
+        #jsonModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #jsonModal.active {
+            display: flex;
+        }
+        #jsonModalContent {
+            background: #fff;
+            color: #000;
+            padding: 1.5rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        #jsonTextarea {
+            width: 100%;
+            height: 250px;
+            font-family: monospace;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+        #modalButtons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        #loadJsonBtn, #closeJsonBtn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #loadJsonBtn {
+            background-color: #00e676;
+            color: #000;
+        }
+        #loadJsonBtn:hover {
+            background-color: #00c853;
+        }
+        #closeJsonBtn {
+            background-color: #ccc;
+            color: #000;
+        }
+        #closeJsonBtn:hover {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <button id="jsonButton">JSON eingeben</button>
+
+    <h1>Deine Empfehlungen</h1>
+    <p class="slogan">Basierend auf deinen Angaben könnten diese Studiengänge passen:</p>
+
+    <div id="resultsContainer"></div>
+    <button class="back-btn" onclick="window.location.href='step2.html'">Zurück</button>
+
+    <!-- Modal -->
+    <div id="jsonModal">
+        <div id="jsonModalContent">
+            <h2>JSON Eingabe</h2>
+            <textarea id="jsonTextarea" placeholder="Hier JSON eingeben..."></textarea>
+            <div id="modalButtons">
+                <button id="loadJsonBtn">Laden</button>
+                <button id="closeJsonBtn">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const resultsContainer = document.getElementById('resultsContainer');
+        const jsonButton = document.getElementById('jsonButton');
+        const jsonModal = document.getElementById('jsonModal');
+        const jsonTextarea = document.getElementById('jsonTextarea');
+        const loadJsonBtn = document.getElementById('loadJsonBtn');
+        const closeJsonBtn = document.getElementById('closeJsonBtn');
+
+        function renderResults(results) {
+            resultsContainer.innerHTML = '';
+            if (!results || results.length === 0) {
+                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte überprüfe deine Eingaben.</p>";
+                return;
+            }
+            results.forEach(vorschlag => {
+                const el = document.createElement('div');
+                el.className = 'result-card';
+                el.setAttribute('data-checklist', JSON.stringify(vorschlag.checklist || []));
+
+                el.innerHTML = `
+                    <div class="bild-container">
+                        <img src="${vorschlag.bild || 'https://via.placeholder.com/200x130'}" alt="${vorschlag['titel des Studiengangs'] || 'Studiengang'}">
+                        <div class="match-faktor">${vorschlag.match || '0'}%</div>
+                    </div>
+                    <div class="infos">
+                        <h3>
+                            ${vorschlag.uniName || '-'}
+                            <a href="${vorschlag.link || '#'}" target="_blank" title="Zum Studiengangsprofil">🔗</a>
+                        </h3>
+                        <p><strong>Studiengang:</strong> ${vorschlag['titel des Studiengangs'] || '-'}</p>
+                        <p><strong>NC:</strong> ${vorschlag.nc || 'keiner'}</p>
+                        <p><strong>Aufnahmeprüfung:</strong> ${vorschlag.aufnahmepruefung ? 'Ja' : 'Nein'}</p>
+                        <p><strong>Studiengebühren:</strong> ${vorschlag.studiengebuehren || '-'}</p>
+                        <p><strong>WG-Kosten:</strong> ${vorschlag.wgKosten || '-'}</p>
+                        <p><strong>Warum das Studium passt:</strong> ${vorschlag.gruendeStudium || '-'}</p>
+                        <p><strong>Warum die Stadt passt:</strong> ${vorschlag.gruendeStadt || '-'}</p>
+                        <button class="bewerbung-link">Jetzt bewerben</button>
+                    </div>
+                `;
+                el.querySelector('.bewerbung-link').addEventListener('click', () => {
+                    alert(`Du möchtest dich für "${vorschlag['titel des Studiengangs']}" an der "${vorschlag.uniName}" bewerben!`);
+                });
+
+                resultsContainer.appendChild(el);
+            });
+        }
+
+        // Beim Laden der Seite direkt aus localStorage laden
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('results');
+            if (stored) {
+                try {
+                    const results = JSON.parse(stored);
+                    renderResults(results);
+                } catch {
+                    resultsContainer.innerHTML = "<p>Gespeicherte Daten sind ungültig.</p>";
+                }
+            } else {
+                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte JSON eingeben.</p>";
+            }
+        });
+
+        // JSON-Button öffnet Modal
+        jsonButton.addEventListener('click', () => {
+            // Falls schon was im localStorage ist, vorbefüllen
+            const stored = localStorage.getItem('results');
+            jsonTextarea.value = stored ? stored : '';
+            jsonModal.classList.add('active');
+        });
+
+        // Modal schließen
+        closeJsonBtn.addEventListener('click', () => {
+            jsonModal.classList.remove('active');
+        });
+
+        // JSON laden, speichern, Modal schließen, Ergebnisse anzeigen
+        loadJsonBtn.addEventListener('click', () => {
+            const input = jsonTextarea.value.trim();
+            if (!input) {
+                alert('Bitte JSON eingeben.');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(input);
+                if (!Array.isArray(parsed)) {
+                    alert('Bitte ein JSON-Array eingeben.');
+                    return;
+                }
+                localStorage.setItem('results', JSON.stringify(parsed));
+                jsonModal.classList.remove('active');
+                renderResults(parsed);
+            } catch(e) {
+                alert('Ungültiges JSON: ' + e.message);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('cacheClearedOnce')) {
+                localStorage.removeItem('results');
+                localStorage.setItem('cacheClearedOnce', 'true');
+            }
+
+            const stored = localStorage.getItem('results');
+            if (stored) {
+                try {
+                    const results = JSON.parse(stored);
+                    renderResults(results);
+                } catch {
+                    resultsContainer.innerHTML = "<p>Gespeicherte Daten sind ungültig.</p>";
+                }
+            } else {
+                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte JSON eingeben.</p>";
+            }
+        });
+    </script>
+</body>
+</html>
