@@ -281,25 +281,22 @@
             });
         }
 
-        // Kombinierter DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem('cacheClearedOnce')) {
-                localStorage.removeItem('results');
-                localStorage.setItem('cacheClearedOnce', 'true');
-            }
+        /document.addEventListener('DOMContentLoaded', () => {
+    localStorage.removeItem('results');  // Immer Cache leeren
+    localStorage.removeItem('cacheClearedOnce');  // Optional, kannst du dann löschen
 
-            const stored = localStorage.getItem('results');
-            if (stored) {
-                try {
-                    const results = JSON.parse(stored);
-                    renderResults(results);
-                } catch {
-                    resultsContainer.innerHTML = "<p>Gespeicherte Daten sind ungültig.</p>";
-                }
-            } else {
-                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte JSON eingeben.</p>";
-            }
-        });
+    const stored = localStorage.getItem('results');
+    if (stored) {
+        try {
+            const results = JSON.parse(stored);
+            renderResults(results);
+        } catch {
+            resultsContainer.innerHTML = "<p>Gespeicherte Daten sind ungültig.</p>";
+        }
+    } else {
+        resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden. Bitte JSON eingeben.</p>";
+    }
+});
 
         // JSON-Button öffnet Modal
         jsonButton.addEventListener('click', () => {
