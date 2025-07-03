@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>UniGate - Zeugnis hochladen</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .slogan {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: #d0d0d0;
+        }
+
+        form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.7rem;
+            margin-top: 0.3rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-btn {
+            background: #fff;
+            color: #2575fc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px dashed #fff;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .upload-btn:hover {
+            background: #2575fc;
+            color: #fff;
+        }
+
+        button {
+            background: #00e676;
+            border: none;
+            color: #000;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #00c853;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .upload-info {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>UniGate</h1>
+    <div class="slogan">Dein Leben. Deine Entscheidung. Dein Weg zum perfekten Studiengang</div>
+    <div class="slogan">Auswahl und Bewerbung - Wir übernehmen das für Dich</div>
+
+    <form id="datenForm" action="step2.html" method="GET" enctype="multipart/form-data">
+
+        <label class="upload-btn" for="zeugnisdatei">📁 Zeugnis hochladen</label>
+        <input type="file" id="zeugnisdatei" name="zeugnisdatei" accept=".pdf,.jpg,.png" class="hidden">
+        <div class="upload-info" id="uploadInfo">Noch keine Datei gewählt</div>
+
+        <label>Letzter Bildungsabschluss</label>
+        <input type="text" name="abschluss" id="abschluss" placeholder="z.B. Abitur 1,7">
+
+        <label>Lieblingsfächer</label>
+        <input type="text" name="noten" id="noten" placeholder="z.B. Mathe, Englisch">
+
+        <label>Wohnort</label>
+        <input type="text" name="wohnort" id="wohnort" placeholder="z.B. Berlin">
+
+        <button type="submit">Weiter</button>
+    </form>
+
+    <script>
+        const fileInput = document.getElementById('zeugnisdatei');
+        const uploadInfo = document.getElementById('uploadInfo');
+        const form = document.getElementById('datenForm');
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                uploadInfo.textContent = "Gewählt: " + fileInput.files[0].name;
+                localStorage.setItem('zeugnisDateiname', fileInput.files[0].name);
+            } else {
+                uploadInfo.textContent = "Noch keine Datei gewählt";
+                localStorage.removeItem('zeugnisDateiname');
+            }
+        });
+
+        form.addEventListener('submit', (e) => {
+            const abschluss = document.getElementById('abschluss').value.trim();
+            const noten = document.getElementById('noten').value.trim();
+            const wohnort = document.getElementById('wohnort').value.trim();
+
+            localStorage.setItem('bildungsabschluss', abschluss);
+            localStorage.setItem('lieblingsfaecher', noten);  // Korrigiert: 'noten' statt 'lieblingsfaecher'
+            localStorage.setItem('wohnort', wohnort);
+
+            // Die Daten werden jetzt im localStorage gespeichert und können auf der nächsten Seite verwendet werden
+        });
+    </script>
+
+</body>
+</html>
