@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>UniGate – Schritt 2</title>
+  <style>
+    /* Grundlegendes Box-Modell und Seitenstil */
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* Hauptüberschrift */
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Untertitel/Slogan */
+    .slogan {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      color: #d0d0d0;
+    }
+
+    /* Formular Container */
+    form {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Container für Checkbox-Kriterien */
+    .kriterien-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Verstecken der Checkboxen */
+    .kriterien-container input[type=checkbox] {
+      display: none;
+    }
+
+    /* Stil für Checkbox-Labels */
+    .kriterien-container label {
+      background: #fff;
+      color: #2575fc;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.3s;
+      user-select: none;
+    }
+
+    /* Aktivierter Checkbox-Label */
+    .kriterien-container input[type=checkbox]:checked + label {
+      background: #00e676;
+      color: #000;
+    }
+
+    /* Hover-Effekt auf Checkbox-Label */
+    .kriterien-container label:hover {
+      background: #2575fc;
+      color: #fff;
+    }
+
+    /* Freitextbereich */
+    textarea[name="freitext"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 3em;
+    }
+
+    /* Absenden-Button */
+    button[type="submit"] {
+      background: #00e676;
+      border: none;
+      color: #000;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.3s;
+    }
+    button[type="submit"]:hover {
+      background: #00c853;
+    }
+
+    /* Popup Overlay */
+    #promptPopup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    /* Popup-Box */
+    #promptPopup > div {
+      background: #fff;
+      color: #000;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      text-align: left;
+      position: relative;
+    }
+
+    /* Textarea im Popup */
+    #promptTextarea {
+      width: 100%;
+      height: 200px;
+      margin-top: 1rem;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-family: monospace, monospace;
+    }
+
+    /* Buttons in Popup */
+    .popup-buttons {
+      margin-top: 1.5rem;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+    .popup-buttons button {
+      padding: 0.7rem 1.2rem;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+    }
+    .confirm-btn {
+      background: #00e676;
+      color: #000;
+    }
+    .cancel-btn {
+      background: #f44336;
+      color: #fff;
+    }
+
+    /* Kopier-Button im Popup */
+    .copy-btn {
+      background: #2196f3;
+      color: #fff;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .copy-btn:hover {
+      background-color: #1976d2;
+    }
+
+    /* Ausgabe-Container */
+    #resultOutput {
+      background: #fff;
+      color: #000;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      font-family: monospace, monospace;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>UniGate</h1>
+  <div class="slogan">Dein Leben. Deine Entscheidung. Dein Weg zum perfekten Studiengang.</div>
+
+  <form id="uniForm">
+    <label for="freitext">Was ist dir wichtig für dein Studium?</label>
+    <textarea id="freitext" name="freitext" placeholder="Beschreibe dein perfektes Studienumfeld…"></textarea>
+
+    <div class="kriterien-container">
+      <input type="checkbox" id="crit-vollzeit"    value="Vollzeit">
+      <label for="crit-vollzeit">Vollzeit</label>
+
+      <input type="checkbox" id="crit-dual"        value="Dual">
+      <label for="crit-dual">Dual</label>
+
+      <input type="checkbox" id="crit-privat"      value="Privat">
+      <label for="crit-privat">Privat</label>
+
+      <input type="checkbox" id="crit-ausbildung"  value="Ausbildung">
+      <label for="crit-ausbildung">Ausbildung</label>
+
+      <input type="checkbox" id="crit-reputation"  value="Uni-Reputation">
+      <label for="crit-reputation">Uni-Reputation</label>
+
+      <input type="checkbox" id="crit-miete"       value="Günstige Miete">
+      <label for="crit-miete">Günstige Miete</label>
+
+      <input type="checkbox" id="crit-coole-stadt" value="Coole Stadt">
+      <label for="crit-coole-stadt">Coole Stadt</label>
+
+      <input type="checkbox" id="crit-natur"       value="Viel Natur">
+      <label for="crit-natur">Viel Natur</label>
+
+      <input type="checkbox" id="crit-internationalität" value="Internationalität">
+      <label for="crit-internationalität">Internationalität</label>
+
+      <input type="checkbox" id="crit-karriere"    value="Karrierechancen">
+      <label for="crit-karriere">Karrierechancen</label>
+
+      <input type="checkbox" id="crit-oeffis"      value="Gute Öffis">
+      <label for="crit-oeffis">Gute Öffis</label>
+
+      <input type="checkbox" id="crit-ausland"     value="Ausland">
+      <label for="crit-ausland">Ausland</label>
+
+      <input type="checkbox" id="crit-wohnortnah"  value="Wohnortnah">
+      <label for="crit-wohnortnah">Wohnortnah</label>
+    </div>
+
+    <input type="hidden" id="kriterien" name="kriterien" />
+    <button type="submit">Ergebnis anzeigen</button>
+  </form>
+
+  <!-- Popup -->
+  <div id="promptPopup">
+    <div>
+      <h2>Überprüfe deinen Text</h2>
+      <button class="copy-btn" id="copyPromptBtn" title="Prompt kopieren">Kopieren</button>
+      <textarea id="promptTextarea" readonly></textarea>
+      <div class="popup-buttons">
+        <button class="confirm-btn" id="confirmPrompt">Bestätigen</button>
+        <button class="cancel-btn"  id="cancelPrompt">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ausgabe vom API Ergebnis -->
+  <pre id="resultOutput"></pre>
+
+  <script>
+    const form       = document.getElementById('uniForm');
+    const popup      = document.getElementById('promptPopup');
+    const promptTA   = document.getElementById('promptTextarea');
+    const confirmBtn = document.getElementById('confirmPrompt');
+    const cancelBtn  = document.getElementById('cancelPrompt');
+    const copyBtn    = document.getElementById('copyPromptBtn');
+    const hiddenKri  = document.getElementById('kriterien');
+    const resultOut  = document.getElementById('resultOutput');
+
+    // Checkbox-Change: Update hidden field mit ausgewählten Kriterien
+    form.querySelectorAll('.kriterien-container input[type=checkbox]')
+      .forEach(cb => cb.addEventListener('change', () => {
+        const vals = Array.from(
+          form.querySelectorAll('.kriterien-container input[type=checkbox]:checked')
+        ).map(i => i.value);
+        hiddenKri.value = vals.join(', ');
+      }));
+
+    function buildPrompt(freitext, kriterien) {
+      // Lade Daten aus localStorage
+      const abschluss = localStorage.getItem('bildungsabschluss') || "Nicht angegeben";
+      const noten = localStorage.getItem('lieblingsfaecher') || "Nicht angegeben";
+      const wohnort = localStorage.getItem('wohnort') || "Nicht angegeben";
+      const zeugnisDateiname = localStorage.getItem('zeugnisDateiname') || "Nicht angegeben";
+
+      let prompt = "Du bist ein Studiengang-Berater. Bitte bewerte folgende Wünsche und Kriterien eines Studieninteressenten:\n\n";
+
+      if (freitext) {
+        prompt += "Freitext-Wunsch:\n" + freitext + "\n\n";
+      } else {
+        prompt += "Kein Freitext-Wunsch angegeben.\n\n";
+      }
+
+      if (kriterien && kriterien.length > 0) {
+        prompt += "Ausgewählte Kriterien:\n" + kriterien.join(", ") + "\n\n";
+      } else {
+        prompt += "Keine Kriterien ausgewählt.\n\n";
+      }
+
+      prompt += "Zusätzliche Angaben:\n";
+      prompt += "- Bildungsabschluss: " + abschluss + "\n";
+      prompt += "- Lieblingsfächer: " + noten + "\n";
+      prompt += "- Wohnort: " + wohnort + "\n";
+      prompt += "- Zeugnis-Dateiname: " + zeugnisDateiname + "\n\n";
+
+      prompt += `Erstelle eine JSON-Liste mit bis zu 5 Studiengang-Empfehlungen basierend auf den obigen Informationen. Der User muss alle Kriterien des Studiengangs erfüllen (z.B. NC und notwendiger schulabschluss oder Wartesemester oder anderes)
+    Jede Empfehlung soll folgende Felder enthalten:
+    - uniName
+    - titel des Studiengangs
+    - link zum Studiengang
+    - bild zur Uni mit Link zum Bild (Bitte gib mir für die Uni direkte Bild-Links zu PNG- oder JPG-Dateien, die ohne CORS-Probleme im Browser funktionieren, idealerweise von der offiziellen Uni-Webseite)
+    - match (berechne eigenständig in %, wie gut der Studiengang zu den Anforderungen passt und sortiere die Liste nach diesem Wert absteigend))
+    - nc (numerus clausus)
+    - aufnahmepruefung
+    - studiengebuehren (Im Semester in Euro)
+    - wgKosten (durchschnittlich in der Stadt der Uni in Euro im Monat)
+    - artStudium (Vollzeit, Dual, ...)
+    - gruendeStudium
+    - gruendeStadt
+
+    Gib die Daten als sauberes, korrektes JSON-Array aus.`;
+
+      return prompt;
+    }
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        const freitext = form.freitext.value.trim();
+        const kriterien = hiddenKri.value ? hiddenKri.value.split(', ').filter(k => k) : [];
+        const promptText = buildPrompt(freitext, kriterien);
+
+        promptTA.value = promptText;
+        popup.style.display = "flex";
+
+        // Ergebnis verstecken
+        resultOut.style.display = 'none';
+        resultOut.textContent = '';
+      });
+
+    confirmBtn.addEventListener('click', () => {
+      popup.style.display = "none";
+
+      // Simuliere API-Call mit setTimeout
+      resultOut.style.display = 'block';
+      resultOut.textContent = "Bitte warten, dein Ergebnis wird geladen...";
+
+      setTimeout(() => {
+        // Beispielantwort (kann hier durch echten API-Call ersetzt werden)
+        const antwort = `Basierend auf deinen Angaben empfehlen wir dir folgende Studiengänge:
+
+- Betriebswirtschaftslehre (Vollzeit, Dual möglich)
+- Internationale Betriebswirtschaft
+- Umweltmanagement (für viel Natur und Karrierechancen)
+
+Viel Erfolg bei deiner Studienwahl!`;
+
+        resultOut.textContent = antwort;
+      }, 1500);
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      popup.style.display = "none";
+    });
+
+    copyBtn.addEventListener('click', () => {
+      promptTA.select();
+      promptTA.setSelectionRange(0, 99999); // Für mobile Geräte
+      navigator.clipboard.writeText(promptTA.value).then(() => {
+        alert('Prompt wurde in die Zwischenablage kopiert!');
+      }, () => {
+        alert('Kopieren nicht möglich. Bitte manuell kopieren.');
+      });
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      popup.style.display = "none";
+
+      // Optional: Hier kannst du noch Daten speichern oder verarbeiten
+
+      // Direkt weiterleiten auf result.html
+      window.location.href = 'result.html';
+    });
+  </script>
+
+</body>
+</html>
