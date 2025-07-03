@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>UniGate – Deine Empfehlungen</title>
     <style>
         * { box-sizing: border-box; }
@@ -56,17 +56,18 @@
             gap: 1.5rem;
             justify-content: center;
         }
-        .result-card {
-            background: #fff;
-            color: #000;
-            border-radius: 10px;
-            width: 280px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s ease;
-        }
+     .result-card {
+    background: #fff;
+    color: #000;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 280px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
         .result-card:hover {
             transform: scale(1.03);
         }
